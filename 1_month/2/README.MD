@@ -27,10 +27,9 @@ promiseReduce(
  },  
  1
 ).then(console.log)  
-  
+```  
 Вывод в консоль
-  
-```
+```  
 fn1  
 reduce  
 fn2  
