@@ -7,7 +7,7 @@ customElements.define('my-tree',
         }
         // Render
         connectedCallback() {
-            this.drawfunc(JSON.parse('{"id": 1,"items": [{"id": 2,"items": [{ "id": 3, "items": [{ "id": 4}]}]}]}'))
+            this.drawfunc(JSON.parse(this.dataset.leaf))
         }
         drawfunc(data) {
             console.log('given tree:',data)
