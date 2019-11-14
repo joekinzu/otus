@@ -14,36 +14,37 @@ class App extends React.Component {
     }
 
     componentDidUpdate(prevProps,prevState) {
-    console.log(prevProps.url,this.props.url)
-    if(this.props.url!==prevProps.url){
-        this.props.fetchcity(this.props.url)
-    }
+        console.log(prevProps.url,this.props.url)
+        if(this.props.url!==prevProps.url){
+            this.props.fetchcity(this.props.url)
+        }
     }
 
 	render() {
 		return (
-      <Main>
-        <Route path='/' exact render={()=>
-          <>
-            <input onChange={(e) => this.props.updatecity(e.target.value)}/>
-            <City
-              name={this.props.data.name}
-              temperature={this.props.data && this.props.data.main ? this.props.data.main.temp : null}
-              wind={this.props.data && this.props.data.wind ? this.props.data.wind.speed : null}
-              humidity={this.props.data && this.props.data.main ? this.props.data.main.humidity : null}
-            />
-            <hr/>
-            <Favorites
-              data={this.props.data}
-            />
-          </>
-        }/>
-        <Route path='/town/:name' render={()=>
-          <>
-            <NavLink to='/'>Back</NavLink>
-            <CityFull name={this.props.data.name}/>
-          </>}/>
-      </Main>
+            <Main>
+            <Route path='/' exact render={()=>
+                <>
+                <input onChange={(e) => this.props.updatecity(e.target.value)}/>
+                    <City
+                        name={this.props.data.name}
+                        temperature={this.props.data && this.props.data.main ? this.props.data.main.temp : null}
+                        wind={this.props.data && this.props.data.wind ? this.props.data.wind.speed : null}
+                        humidity={this.props.data && this.props.data.main ? this.props.data.main.humidity : null}
+                    />
+                    <hr/>
+                    <Favorites
+                        data={this.props.data}
+                    />
+                </>
+            }/>
+            <Route path='/town/:name' render={()=>
+                <>
+                    <NavLink to='/'>Back</NavLink>
+                    <CityFull name={this.props.data.name}/>
+                </>
+            }/>
+            </Main>
 		)
 	}
 }

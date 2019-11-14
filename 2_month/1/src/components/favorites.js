@@ -1,38 +1,23 @@
 import React from 'react'
 import {NavLink} from 'react-router-dom'
+import {connect} from 'react-redux'
+import {addfavorite, deletefavorite} from '../store/actions/city'
 
 class Favorites extends React.Component{
-
-    state = { 
-            fav:[],
-        }
-
-        addme = (newdata) => {
-        let data = this.state.fav
-        data.push(newdata)
-        this.setState({fav: data})
-        }
-
-
-        deleteme = (index) => {
-        let data = this.state.fav
-        data.splice(index,1)
-        this.setState({fav: data})
-        }
         
         render(){
             return (
                 <>
                     Favorites 
                     <br/> 
-                        <button onClick={this.addme.bind(this,this.props.data)}>Add</button>
-                        {this.state.fav.map((favs,index) =>
+                        <button onClick={() => this.props.addfavorite(this.props.data)}>Add</button>
+                        {this.props.fav.map((favs,index) =>
                         <li key={index}>
                             <NavLink to={'/town/'+favs.name}>
                                 {favs.name},
                             </NavLink>
                             {favs.main.temp},  {favs.wind.speed+'  '}
-                            <button onClick={this.deleteme.bind(this,index)}>Delete</button>
+                            <button onClick={() => this.props.deletefavorite(index)}>Delete</button>
                         </li>
                     )}
                 </>
@@ -40,4 +25,17 @@ class Favorites extends React.Component{
     }
 }
 
-export default Favorites
+const mapStateToProps = (state) =>{
+    return{
+      fav: state.city.fav
+    }
+  }
+  
+  const mapDispatchToProps = (dispatch) =>{
+    return{
+      addfavorite: (name) => dispatch(addfavorite(name)),
+      deletefavorite: (name) => dispatch(deletefavorite(name))
+    }
+  }
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(Favorites)

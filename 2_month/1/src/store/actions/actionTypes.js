@@ -1,2 +1,5 @@
 export const UPDATE_CITY = 'UPDATE_CITY'
 export const FETCH_CITY = 'FETCH_CITY'
+export const FETCH_CITY_FULL = 'FETCH_CITY_FULL'
+export const ADD_FAVORITE = 'ADD_FAVORITE'
+export const DELETE_FAVORITE = 'DELETE_FAVORITE'
