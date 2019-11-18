@@ -1,42 +1,31 @@
-import React from 'react'
-import {connect} from 'react-redux'
-import {fetchcityfull} from '../store/actions/city'
+import React, {useContext, useEffect} from 'react'
+import CityContext from '../context/city/cityContext'
 
-class CityFull extends React.Component{
+const CityFull = () => {
 
-    componentDidMount() {
-        this.props.fetchcityfull(this.props.name)
-    }
+  const cityContext = useContext(CityContext)
+  const {url, fulldata, fetchcityfull} = cityContext
 
-    render(){
-        return (
-            <>
-                {console.log('url param: ',this.props.url)}
-                <h2>{this.props.name}</h2> 5 day forecast
-                <hr/>
-                {this.props.fulldata.map((favs,index) => 
-                    <li key={index}>
-                        {favs.dt_txt + ' - '} 
-                        {favs && favs.main ? favs.main.temp : null},
-                        {favs && favs.wind ? favs.wind.speed : null}
-                    </li>
-                )} 
-            </>
-        )
-    }
+  useEffect(() => {
+    fetchcityfull(url)
+    // eslint-disable-next-line
+  }, [url])
+
+    return (
+        <>
+            {console.log('url param: ',url)}
+            <h2>{url}</h2> 5 day forecast
+            <hr/>
+            {fulldata.map((favs,index) => 
+                <li className='list' key={index}>
+                    {favs.dt_txt + ' - '} 
+                    {favs && favs.main ? favs.main.temp : null},
+                    {favs && favs.wind ? favs.wind.speed : null}
+                </li>
+            )} 
+        </>
+    )
 }
 
-const mapStateToProps = (state) =>{
-    return{
-      url: state.city.url,
-      fulldata: state.city.fulldata
-    }
-  }
   
-const mapDispatchToProps = (dispatch) =>{
-    return{
-      fetchcityfull: (name) => dispatch(fetchcityfull(name))
-    }
-  }
-  
-  export default connect(mapStateToProps, mapDispatchToProps)(CityFull)
+export default CityFull

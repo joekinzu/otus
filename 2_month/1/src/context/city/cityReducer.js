@@ -1,13 +1,6 @@
-import {UPDATE_CITY, FETCH_CITY, FETCH_CITY_FULL, ADD_FAVORITE, DELETE_FAVORITE} from '../actions/actionTypes'
+import {UPDATE_CITY, FETCH_CITY, FETCH_CITY_FULL, ADD_FAVORITE, DELETE_FAVORITE} from '../actionTypes'
 
-const initialState = {
-    data: [],
-    fulldata: [],
-    url: 'Izhevsk',
-    fav: []
-}
-
-export default function city(state = initialState, action){
+export default (state, action) => {
     switch(action.type){
         case FETCH_CITY:
             return{

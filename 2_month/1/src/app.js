@@ -1,66 +1,44 @@
 import React from 'react'
-import {Route, NavLink} from 'react-router-dom' 
+import {BrowserRouter as Router, Route, NavLink,Switch} from 'react-router-dom'
+import CityState  from './context/city/cityState'
+import './app.css'
 import Main from './hoc/main'
 import City from './components/city'
 import CityFull from './components/cityfull'
 import Favorites from './components/favorites'
-import {connect} from 'react-redux'
-import {updatecity, fetchcity} from './store/actions/city'
 
-class App extends React.Component {
+const App = () => {
 
-    componentDidMount() {
-        this.props.fetchcity(this.props.url)
-    }
-
-    componentDidUpdate(prevProps,prevState) {
-        console.log(prevProps.url,this.props.url)
-        if(this.props.url!==prevProps.url){
-            this.props.fetchcity(this.props.url)
-        }
-    }
-
-	render() {
 		return (
+            <CityState>
+            <Router>
             <Main>
-            <Route path='/' exact render={()=>
-                <>
-                <input onChange={(e) => this.props.updatecity(e.target.value)}/>
-                    <City
-                        name={this.props.data.name}
-                        temperature={this.props.data && this.props.data.main ? this.props.data.main.temp : null}
-                        wind={this.props.data && this.props.data.wind ? this.props.data.wind.speed : null}
-                        humidity={this.props.data && this.props.data.main ? this.props.data.main.humidity : null}
-                    />
-                    <hr/>
-                    <Favorites
-                        data={this.props.data}
-                    />
-                </>
-            }/>
-            <Route path='/town/:name' render={()=>
-                <>
-                    <NavLink to='/'>Back</NavLink>
-                    <CityFull name={this.props.data.name}/>
-                </>
-            }/>
+            <Switch>
+                <Route path='/' exact render={()=>
+                    <>
+                        <City/>
+                        <hr/>
+                        <Favorites/>
+                    </>
+                }/>
+                <Route path='/town/:name' render={()=>
+                    <>
+                        <NavLink to='/'>Back</NavLink>
+                        <CityFull/>
+                    </>
+                }/>
+                <Route render={()=>
+                    <div>
+                        <h1>Not Found</h1>
+                        <p className='lead'>The page you are looking for does not exist...</p>
+                        <NavLink to='/'>Home</NavLink>
+                    </div>
+                }/>
+            </Switch>    
             </Main>
+            </Router>
+            </CityState>
 		)
-	}
 }
 
-const mapStateToProps = (state) =>{
-  return{
-    url: state.city.url,
-    data: state.city.data
-  }
-}
-
-const mapDispatchToProps = (dispatch) =>{
-  return{
-    updatecity: (name) => dispatch(updatecity(name)),
-    fetchcity: (name) => dispatch(fetchcity(name))
-  }
-}
-
-export default connect(mapStateToProps, mapDispatchToProps)(App)
+export default App
