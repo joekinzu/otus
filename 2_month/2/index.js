@@ -1,41 +1,18 @@
-let fs = require('fs')
-let path = require('path')
-let results = {files:[], dirs: []}
+const fs = require("fs")
+let args = process.argv.slice(2)
+let pathSample = args[1]
+let resultJSON = { files: [], dirs: [] }
 
-const dirList = async (dir, done) => {
-    await fs.readdir(dir, (err, itemList) => {
-        let itemsForProcess = itemList.length
-
-        if (!itemsForProcess) {
-            return done(null, results)
-        }
-
-        itemList.forEach((file) => {
-            file = path.resolve(dir, file)
-            fs.stat(file, (err, stat) => {
-                if (stat && stat.isDirectory()) {
-                    results.dirs.push(file)
-                    dirList(file, (err, res) => {
-                        if (err) {
-                            return done(err)
-                        }
-                        results.dirs = results.dirs.concat(res.dirs)
-                        results.files = results.files.concat(res.files)
-                        if (!--itemsForProcess) {
-                            done(null, results)
-                        }
-                    })
-                } else {
-                    results.files.push(file)
-                    --itemsForProcess
-                    if (!itemsForProcess) {
-                        done(null, results)
-                    }
-                }
-            })
-        })
+F = PS => {
+    return new Promise((resolve) => {
+      fs.readdir(PS, function(err, items) {
+          items.map(e => {
+              let fullPatch = PS + "/" + e
+              fs.statSync(fullPatch).isFile() ? resultJSON.files.push(fullPatch) : resultJSON.dirs.push(fullPatch) && F(fullPatch)
+          })
+      })
+      setTimeout(() => resolve(resultJSON), 100)
     })
 }
 
-dirList(__dirname,)
-console.log(results)  
+F(pathSample).then(res => console.log(res))
