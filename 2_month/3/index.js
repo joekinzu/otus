@@ -1,71 +1,48 @@
-// Этап 1 
 const fs = require('fs')
 
-function merge_sort(left_part,right_part) 
-{
-	let i = 0;
-	let j = 0;
-	let results = [];
+function mergeTwo(arr1, arr2) {
+  let merged = []
+  let index1 = 0
+  let index2 = 0
+  let current = 0
+  while (current < (arr1.length + arr2.length)) {
+    let isArr1Depleted = index1 >= arr1.length
+    let isArr2Depleted = index2 >= arr2.length
+    if (!isArr1Depleted && (isArr2Depleted || (arr1[index1] < arr2[index2]))) {
+    merged[current] = arr1[index1]
+    index1++
+    } else {
+    merged[current] = arr2[index2]
+    index2++
+    }
+    current++
+  }
+  return merged
+  }
 
-	while (i < left_part.length || j < right_part.length) {
-		if (i === left_part.length) {
-			// j is the only index left_part
-			results.push(right_part[j]);
-			j++;
-		} 
-      else if (j === right_part.length || left_part[i] <= right_part[j]) {
-			results.push(left_part[i]);
-			i++;
-		} else {
-			results.push(right_part[j]);
-			j++;
-		}
-	}
-	return results;
-}
-
-
+// number of files
 const num = 5
 const wstream = fs.createWriteStream('datasorted.txt')
 const rstream = []
 let old = []
-let old1 = [];
+let old1 = []
 
-[...Array(num)].map((item,index) => {
-    rstream.push(fs.createReadStream('data'+(num-index)+'.txt',{encoding: 'utf8', fd: null,}))
-})
+for(i=0;i<num;i++){
+    rstream.push(fs.createReadStream('data'+(num-i)+'.txt',{encoding: 'utf8', fd: null,objectMode: true}))
+}
 
 rstream.map((item,index)=> {
-    rstream[index].on('readable', (chunk) => {
-        while(chunk = rstream[index].read(100)){
-            // console.log(chunk,'CHHH')
-            // console.log(Array.from(chunk))
-            // old.push(parseInt(chunk))
+    rstream[index].on('data', (chunk) => {
             Array.from(chunk).map((el,index) => old.push(parseInt(el)))
-        }
-        // console.log(old)
       })
 
-    rstream[index].on('end', () => {
-        console.log('end',old.length)
-        // old1 = merge_sort(old,old1)
-        wstream.write(old.sort().join(''))
-        // old1 = old
-        old = []
-    })
+  rstream[index].on('end', () => {
+    console.log('end',old.length,old1.length)
+    old1.length>0 ? old1=mergeTwo(old.sort(),old1) : old1=old.sort()
+    if(index == rstream.length-1){
+      wstream.write(old1.join(''))
+      wstream.destroy()
+    }
+    old = []
+  })
 })
-
-// stream2.on('readable', (chunk) => {
-//     while(chunk = stream2.read(1)){
-//         // console.log(chunk)
-//         old1.push(parseInt(chunk))
-//     }
-//     // console.log(old1)
-//   })
-// console.log(old1.length)
-
-// stream2.on('end', () => {
-//     console.log('end',old1.length)
-//     old1=merge_sort(old,old1)
-//     wstream.write(old1.sort().join(''))
-// })
