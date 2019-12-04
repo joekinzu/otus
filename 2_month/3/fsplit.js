@@ -1,9 +1,8 @@
-// Этап 1 
 const fs = require('fs')
 
 const stream = fs.createReadStream('data.txt', {encoding: 'utf8', fd: null,})
 
-const num = 20
+const num = 10
 let i = Math.floor(Math.random()*num+1)
 let wstream = [];
 
@@ -11,11 +10,9 @@ let wstream = [];
         wstream.push(fs.createWriteStream('data'+(num-index)+'.txt'))
     })
 
-stream.on('readable', (chunk) => {
-    while(chunk = stream.read(100)){
-        wstream[i-1].write(chunk)
+stream.on('data', (data) => {
+        wstream[i-1].write(data)
         i = Math.floor(Math.random()*num+1)
-    }
   })
 
 stream.on('end', () => {
