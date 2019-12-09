@@ -1,48 +1,53 @@
 const fs = require('fs')
+const readline = require("readline")
 
-function mergeTwo(arr1, arr2) {
-  let merged = []
-  let index1 = 0
-  let index2 = 0
-  let current = 0
-  while (current < (arr1.length + arr2.length)) {
-    let isArr1Depleted = index1 >= arr1.length
-    let isArr2Depleted = index2 >= arr2.length
-    if (!isArr1Depleted && (isArr2Depleted || (arr1[index1] < arr2[index2]))) {
-    merged[current] = arr1[index1]
-    index1++
-    } else {
-    merged[current] = arr2[index2]
-    index2++
+// temp data
+let s = ''
+// files count
+let wcount = 0
+// file size in mb
+const filesize = 10*1024*1024
+// source file
+const rstream= fs.createReadStream('data.txt',)
+const rstream_arr = []
+let lineReader = [];
+
+rstream.on('data', (chunk) => {
+  s = s + chunk
+  if(s.length > filesize){
+    rstream.pause()
+    wcount++
+    const wstream = fs.createWriteStream('data'+wcount+'.txt')
+    for(let j=0;j<10;j++){
+      re = new RegExp(j, 'g')
+      wstream.write(s.match(re).join('')+'\n')
     }
-    current++
+    s = ''
+    rstream.resume()
   }
-  return merged
+})
+
+rstream.on('end', () => {
+  wcount++
+  const wstream = fs.createWriteStream('data'+wcount+'.txt')
+  for(let j=0;j<10;j++){
+    re = new RegExp(j, 'g')
+    wstream.write(s.match(re).join('')+'\n')
   }
+  const wstream_sort = fs.createWriteStream('datasorted.txt')
+  for(let i=0;i<wcount;i++){
+    rstream_arr.push('data'+(i+1)+'.txt')
+  }
+  
+  for(let x in rstream_arr) {
+    let fileName = rstream_arr[x]
+    lineReader[x] = readline.createInterface({
+        input: fs.createReadStream(fileName)
+    })
 
-// number of files
-const num = 5
-const wstream = fs.createWriteStream('datasorted.txt')
-const rstream = []
-let old = []
-let old1 = []
-
-for(i=0;i<num;i++){
-    rstream.push(fs.createReadStream('data'+(num-i)+'.txt',{encoding: 'utf8', fd: null,objectMode: true}))
-}
-
-rstream.map((item,index)=> {
-    rstream[index].on('data', (chunk) => {
-            Array.from(chunk).map((el,index) => old.push(parseInt(el)))
-      })
-
-  rstream[index].on('end', () => {
-    console.log('end',old.length,old1.length)
-    old1.length>0 ? old1=mergeTwo(old.sort(),old1) : old1=old.sort()
-    if(index == rstream.length-1){
-      wstream.write(old1.join(''))
-      wstream.destroy()
-    }
-    old = []
-  })
+    lineReader[x].on('line', function(line) {
+        wstream_sort.write(line)
+    })
+  }
+console.log(wcount, ' files created')
 })
