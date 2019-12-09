@@ -1,20 +1,35 @@
 const fs = require('fs')
 
-const stream = fs.createReadStream('data.txt', {encoding: 'utf8', fd: null,})
+let s = ''
+// files count
+let wcount = 0
+// file size in mb
+const filesize = 20*1024*1024
+// source file
+const rstream= fs.createReadStream('data.txt')
 
-const num = 10
-let i = Math.floor(Math.random()*num+1)
-let wstream = [];
-
-[...Array(num)].map((item,index) => {
-        wstream.push(fs.createWriteStream('data'+(num-index)+'.txt'))
-    })
-
-stream.on('data', (data) => {
-        wstream[i-1].write(data)
-        i = Math.floor(Math.random()*num+1)
-  })
-
-stream.on('end', () => {
-    console.log('end')
+rstream.on('data', (chunk) => {
+  s = s + chunk
+  if(s.length > filesize){
+    rstream.pause()
+    wcount++
+    const wstream = fs.createWriteStream('data'+wcount+'.txt')
+    for(let j=0;j<10;j++){
+      re = new RegExp(j, 'g')
+      wstream.write(s.match(re).join('')+'\n')
+    }
+    s = ''
+    rstream.resume()
+  }
 })
+
+rstream.on('end', () => {
+  rstream.destroy()
+  wcount++
+  const wstream = fs.createWriteStream('data'+wcount+'.txt')
+  for(let j=0;j<10;j++){
+    re = new RegExp(j, 'g')
+    wstream.write(s.match(re).join('')+'\n')
+  }
+console.log(wcount, ' files created')
+})    
