@@ -1,81 +1,162 @@
-const graphql = require('graphql');
-const _ = require('lodash');
 const {
+    GraphQLSchema,
     GraphQLObjectType,
     GraphQLString,
-    GraphQLSchema,
-    GraphQLID,
+    GraphQLList,
     GraphQLInt,
-    GraphQLList
-} = graphql;
+    GraphQLNonNull
+  } = require('graphql')
 
 // dummy data
-var books = [
-    { name: 'Name of the Wind', genre: 'Fantasy', id: '1', authorId: '1' },
-    { name: 'The Final Empire', genre: 'Fantasy', id: '2', authorId: '2' },
-    { name: 'The Hero of Ages', genre: 'Fantasy', id: '4', authorId: '2' },
-    { name: 'The Long Earth', genre: 'Sci-Fi', id: '3', authorId: '3' },
-    { name: 'The Colour of Magic', genre: 'Fantasy', id: '5', authorId: '3' },
-    { name: 'The Light Fantastic', genre: 'Fantasy', id: '6', authorId: '3' },
-];
+// 4 сущности - users, items, categories, orders
+const users = [
+	{ id: 1, name: 'Bob Dotson' },
+	{ id: 2, name: 'Mike Puppet' },
+	{ id: 3, name: 'Jane Doe' }
+]
 
-var authors = [
-    { name: 'Patrick Rothfuss', age: 44, id: '1' },
-    { name: 'Brandon Sanderson', age: 42, id: '2' },
-    { name: 'Terry Pratchett', age: 66, id: '3' }
-];
+const items = [
+	{ id: 1, name: 'Lego', catid: 1 },
+	{ id: 2, name: 'Harry Potter', catid: 2 },
+	{ id: 3, name: 'Jedi Knight', catid: 1 },
+]
 
-const BookType = new GraphQLObjectType({
-    name: 'Book',
-    fields: ( ) => ({
-        id: { type: GraphQLID },
-        name: { type: GraphQLString },
-        genre: { type: GraphQLString },
-        author: {
-            type: AuthorType,
-            resolve(parent, args){
-                return _.find(authors, { id: parent.authorId });
-            }
-        }
-    })
-});
+const categories = [
+	{ id: 1, type: 'Toys'},
+	{ id: 2, type: 'Books'},
+]
 
-const AuthorType = new GraphQLObjectType({
-    name: 'Author',
-    fields: ( ) => ({
-        id: { type: GraphQLID },
-        name: { type: GraphQLString },
-        age: { type: GraphQLInt },
-        books: {
-            type: new GraphQLList(BookType),
-            resolve(parent, args){
-                return _.filter(books, { authorId: parent.id });
-            }
-        }
-    })
-});
+const orders = [
+    {id:1, userid: 1, itemid: 1 }
+]
 
-const RootQuery = new GraphQLObjectType({
-    name: 'RootQueryType',
-    fields: {
-        book: {
-            type: BookType,
-            args: { id: { type: GraphQLID } },
-            resolve(parent, args){
-                // code to get data from db / other source
-                return _.find(books, { id: args.id });
-            }
-        },
-        author: {
-            type: AuthorType,
-            args: { id: { type: GraphQLID } },
-            resolve(parent, args){
-                return _.find(authors, { id: args.id });
-            }
-        }
+// code
+const ItemType = new GraphQLObjectType({
+  name: 'Item',
+  description: 'Store Item',
+  fields: () => ({
+    id: { type: GraphQLNonNull(GraphQLInt) },
+    name: { type: GraphQLNonNull(GraphQLString) },
+    catid: { type: GraphQLNonNull(GraphQLInt) },
+    category: {
+      type: categoryType,
+      resolve: (item) => {
+        return categories.find(category => category.id === item.catid)
+      }
     }
-});
+  })
+})
+
+const categoryType = new GraphQLObjectType({
+    name: 'Category',
+    description: 'Store Category',
+    fields: () => ({
+      id: { type: GraphQLNonNull(GraphQLInt) },
+      type: { type: GraphQLNonNull(GraphQLString) },
+      item: {
+        type: ItemType,
+        resolve: (category) => {
+          return items.find(item => item.catid === category.id)
+        }
+      }
+    })
+  })
+
+  const UserType = new GraphQLObjectType({
+    name: 'User',
+    description: 'Users',
+    fields: () => ({
+      id: { type: GraphQLNonNull(GraphQLInt) },
+      name: { type: GraphQLNonNull(GraphQLString) },
+    })
+  })
+
+  const OrderType = new GraphQLObjectType({
+    name: 'Order',
+    description: 'Orders',
+    fields: () => ({
+      id: { type: GraphQLNonNull(GraphQLInt) },
+      user: {
+        type: UserType,
+        resolve: (element) => {
+          return users.find(user => user.id === element.userid)
+        }
+      },
+      item: {
+        type: ItemType,
+        resolve: (element) => {
+          return items.find(item => item.id === element.itemid)
+        }
+      }
+    })
+  })
+
+// 6 запросов - show single item, show all items, show all cats, show single user, show users, show orders  
+const RootQueryType = new GraphQLObjectType({
+  name: 'Query',
+  description: 'Root Query',
+  fields: () => ({
+    item: {
+      type: ItemType,
+      description: 'Single Item',
+      args: {
+        id: { type: GraphQLInt }
+      },
+      resolve: (parent, args) => items.find(item => item.id === args.id)
+    },
+    items: {
+        type: new GraphQLList(ItemType),
+        description: 'All Items',
+        resolve: () => items
+      },
+    categories: {
+        type: new GraphQLList(categoryType),
+        description: 'All categories',
+        resolve: () => categories
+    },
+    user: {
+        type: UserType,
+        description: 'Single User',
+        args: {
+          id: { type: GraphQLInt }
+        },
+        resolve: (parent, args) => users.find(item => item.id === args.id)
+      },
+    users: {
+        type: new GraphQLList(UserType),
+        description: 'All users',
+        resolve: () => users
+    },
+    orders: {
+        type: new GraphQLList(OrderType),
+        description: 'All orders',
+        resolve: () => orders
+    },
+  })
+})
+
+// 1 мутация - add an order
+const RootMutationType = new GraphQLObjectType({
+  name: 'Mutation',
+  description: 'Root Mutation',
+  fields: () => ({
+    addOrder: {
+      type: OrderType,
+      description: 'Add an order',
+      args: {
+        userid: { type: GraphQLNonNull(GraphQLInt) },
+        itemid: { type: GraphQLNonNull(GraphQLInt) }
+      },
+      resolve: (parent, args) => {
+        const order = { id: orders.length + 1, userid: args.userid, itemid: args.itemid }
+        orders.push(order)
+        return order
+      }
+    },
+  })
+})
 
 module.exports = new GraphQLSchema({
-    query: RootQuery
-});
+  query: RootQueryType,
+  mutation: RootMutationType
+})
