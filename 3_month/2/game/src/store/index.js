@@ -1,17 +1,18 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-// import createPersistedState from 'vuex-persistedstate'
+import createPersistedState from 'vuex-persistedstate'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
     operations: [],
+    resultarray:[],
     time: 0,
     level: 0, 
     correctAnswers: 0,
     Tries: 1
   },
-  // plugins: [createPersistedState()],
+  plugins: [createPersistedState()],
   mutations: {
     setTime(store, payload) {
       store.time = payload.amount
@@ -27,6 +28,9 @@ export default new Vuex.Store({
     },
     setcorrectAnswers(store, payload) {
       store.correctAnswers = payload.amount
+    },
+    setResultArray(store, payload) {
+      store.resultarray = payload.amount
     }
   }
 })

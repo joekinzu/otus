@@ -4,6 +4,7 @@
         <hr>
         <h3>Last Result {{correctAnswers}} of {{Tries-1}} 
           ({{percent(correctAnswers,Tries-1)}} %)</h3>
+        <button @click="statsClick">Stats</button>  
         <ul>
           <li>Round Time : <input v-model="roundTime"></li>
           Game Level : <select v-model="level">
@@ -50,13 +51,16 @@
         'setOperations',
       ]),
       percent(a,b){
-        return (a/b)*100
+        return Math.round((a/b)*100)
       },
       handleSubmit() {
         this.setTime({amount: this.roundTime})
         this.setLevel({amount: this.level})
         this.setOperations({amount: this.checked})
         this.$router.push('/game')
+      },
+      statsClick() {
+        this.$router.push('/stats')
       }
     }
   }

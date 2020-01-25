@@ -47,6 +47,7 @@
       return {
         level: this.$store.state.level,
         operations: this.$store.state.operations,
+        resultarray: this.$store.state.resultarray,
         currentTime: this.$store.state.time,
         currentOperation: '+',
         timer: null,
@@ -71,7 +72,8 @@
     methods: {
       ...mapMutations([
         'setTries',
-        'setcorrectAnswers'
+        'setcorrectAnswers',
+        'setResultArray'
       ]),
 
       start() {
@@ -83,8 +85,6 @@
               }
             } else {
               this.pause = true
-              this.setTries({amount: this.Tries})
-              this.setcorrectAnswers({amount: this.correctAnswers})
               this.stop()
             }
           }, 1000)
@@ -95,6 +95,8 @@
         clearInterval(this.timer)
         this.setTries({amount: this.Tries})
         this.setcorrectAnswers({amount: this.correctAnswers})
+        this.resultarray.push({time: new Date, answers: this.correctAnswers, tries: this.Tries})
+        this.setResultArray({amount: this.resultarray})
         this.$router.push('/')
       },
 
