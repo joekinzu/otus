@@ -1,0 +1,9 @@
+div {
+  box-sizing: border-box;
+  text-align: center;
+  background-color: burlywood;
+}
+
+a {
+  padding: 10px;
+}

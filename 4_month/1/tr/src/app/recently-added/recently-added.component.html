@@ -1,0 +1,26 @@
+<div>
+  <div>
+    Words list:
+    <ul>
+      <li *ngFor="let dictItem of dict">
+        {{ dictItem.word }} - {{ dictItem.translate }}
+      </li>
+    </ul>
+  </div>
+  <div>
+    <div>
+      <input [(ngModel)]="userInput">
+      <button [disabled]="!userInput" (click)="onTranslate()">
+        Translate
+      </button>
+      <button [disabled]="!canSave" (click)="onSave()">
+        Save
+      </button>
+    </div>
+    <ul *ngIf="dictItems">
+      <li *ngFor="let dictItem of dictItems">
+        {{ dictItem.word }} - {{ dictItem.translate }}
+      </li>
+    </ul>
+  </div>
+</div>

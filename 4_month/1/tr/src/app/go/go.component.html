@@ -1,0 +1,16 @@
+<div>
+    <h3>{{message}}</h3>
+    <span *ngIf="turn < level">
+      Quiz: {{turn + 1}}/{{level}}
+    </span>
+  <div>
+    <div>
+      <input [placeholder]="placeholder" [(ngModel)]="userInput" [disabled]="disableInput">
+    </div>
+  </div>
+  <div>
+    <button (click)="onNextClick()" [disabled]="!userInput && !disableInput">
+      Answer
+    </button>
+  </div>
+</div>

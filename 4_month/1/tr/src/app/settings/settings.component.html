@@ -1,0 +1,26 @@
+<div>
+  <div>
+    <select [value]="selectedLang.value" (change)="onChangeLangSelect($event.target.value)">
+      <option *ngFor="let lang of languages" [value]="lang.value" >
+        {{lang.display}}
+      </option>
+    </select>
+    <select [value]="selectedLevel" (change)="onChangeLevSelect($event.target.value)">
+      <option *ngFor="let level of levels" [value]="level" >
+        {{level}}
+      </option>
+    </select>
+    <br>Language: {{selectedLang.display}} | Tries: {{selectedLevel}}
+  </div>
+  <div>
+    <button (click)="onResetClick()">
+      Reset
+    </button>
+    <button (click)="onAgreeClick()">
+      Accept
+    </button>
+    <button (click)="onClearClick()">
+      Clear
+    </button>
+  </div>
+</div>
